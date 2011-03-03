@@ -35,7 +35,7 @@ class ChunkNode(template.Node):
             if c is None:
                 c = Chunk.objects.get(key=self.key)
                 cache.set(cache_key, c, int(self.cache_time))
-            content = template.loader.render_to_string("chunks/chunk.html", {"chunk": c.content, "request": context["request"]})
+            content = template.loader.render_to_string("chunks/chunk.html", {"chunk": c, "request": context["request"]})
         except Chunk.DoesNotExist:
             content = ''
         return content
