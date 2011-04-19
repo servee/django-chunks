@@ -1,3 +1,5 @@
+Custom Servee build of chunks
+
 Think of it as flatpages for small bits of reusable content you might want to insert into your templates and manage from the admin interface.
 
 This is really nothing more than a model and a template tag.

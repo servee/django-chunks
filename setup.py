@@ -1,12 +1,15 @@
 from distutils.core import setup
 
 setup(name='chunks',
-      version='0.1',
+      version='0.2.1',
       description='Keyed blocks of content for use in your Django templates',
-      author='Clint Ecker',
+      author='Clint Ecker - Modified for servee by Issac Kelly',
       author_email='me@clintecker.com',
       url='http://code.google.com/p/django-chunks/',
       packages=['chunks', 'chunks.templatetags'],
+      package_data={"chunks": ["templates/chunks/*.html"]},
+      zip_safe=False,
+      include_package_data=True,
       classifiers=['Development Status :: 4 - Beta',
                    'Environment :: Web Environment',
                    'Intended Audience :: Developers',
