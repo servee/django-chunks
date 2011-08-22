@@ -41,7 +41,7 @@ class ChunkNode(template.Node):
                 "chunks/chunk.html",
             ]
             
-            content = template.loader.render_to_string(templates, {"chunk": c, "request": context["request"]})
+            content = template.loader.render_to_string(templates, {"chunk": c, "request": context.get("request", None)})
         except Chunk.DoesNotExist:
             content = ''
         return content
