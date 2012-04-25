@@ -7,6 +7,7 @@ register = template.Library()
 Chunk = models.get_model('chunks', 'chunk')
 CACHE_PREFIX = "chunk_"
 
+
 def do_get_chunk(parser, token):
     # split_contents() knows not to split quoted strings.
     tokens = token.split_contents()
@@ -22,28 +23,31 @@ def do_get_chunk(parser, token):
         raise template.TemplateSyntaxError, "%r tag's argument should be in quotes" % tag_name
     # Send key without quotes and caching time
     return ChunkNode(key[1:-1], cache_time)
-    
+
+
 class ChunkNode(template.Node):
     def __init__(self, key, cache_time=0):
-       self.key = key
-       self.cache_time = cache_time
-    
+        self.key = key
+        self.cache_time = cache_time
+
     def render(self, context):
-        try:
+        content = ''
+
+        if context['request'].user.is_authenticated():
+            cache_key = "".join([CACHE_PREFIX, self.key, str(context['request'].user.id)])
+        else:
             cache_key = CACHE_PREFIX + self.key
-            c = cache.get(cache_key)
-            if c is None:
-                c = Chunk.objects.get(key=self.key)
-                cache.set(cache_key, c, int(self.cache_time))
-            
-            templates = [
-                "chunks/%s.html" % c,
-                "chunks/chunk.html",
-            ]
-            
-            content = template.loader.render_to_string(templates, {"chunk": c, "request": context.get("request", None)})
-        except Chunk.DoesNotExist:
-            content = ''
+
+        c = cache.get(cache_key)
+        if c is None:
+            c, created = Chunk.objects.get_or_create(key=self.key)
+            cache.set(cache_key, c, int(self.cache_time))
+
+        templates = [
+            "chunks/%s.html" % c,
+            "chunks/chunk.html",
+        ]
+        content = template.loader.render_to_string(templates, {"chunk": c, "request": context.get("request", None)})
         return content
-        
+
 register.tag('chunk', do_get_chunk)
