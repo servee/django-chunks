@@ -1,4 +1,6 @@
 from django.db import models
+from django.core.cache import cache
+
 
 class Chunk(models.Model):
     """
@@ -12,3 +14,7 @@ class Chunk(models.Model):
 
     def __unicode__(self):
         return u"%s" % (self.key,)
+
+    def save(self, *args, **kwargs):
+        cache.delete('chunk_%s' % self.key)
+        return super(Chunk, self).save(*args, **kwargs)
