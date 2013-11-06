@@ -32,16 +32,13 @@ class ChunkNode(template.Node):
 
     def render(self, context):
         content = ''
-
-        if context['request'].user.is_authenticated():
-            cache_key = "".join([CACHE_PREFIX, self.key, str(context['request'].user.id)])
-        else:
-            cache_key = CACHE_PREFIX + self.key
+        cache_key = CACHE_PREFIX + self.key
 
         c = cache.get(cache_key)
         if c is None:
             c, created = Chunk.objects.get_or_create(key=self.key)
-            cache.set(cache_key, c, int(self.cache_time))
+            if not context['request'].user.is_authenticated():
+                cache.set(cache_key, c, int(self.cache_time))
 
         templates = [
             "chunks/%s.html" % c,
